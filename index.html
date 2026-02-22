@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Chana Intel Dashboard</title>
+    <title>Chana Intel PWA</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
     <link rel="manifest" href="./manifest.json" />
   </head>
@@ -20,23 +20,66 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-st.title("🌾 Chana Intelligence Dashboard")
-st.markdown("### Daily Updates for Bikaner & Sehore")
+st.set_page_config(page_title="Chana Intelligence", layout="wide")
 
-# Simple Data Table
-data = {'Market': ['Bikaner', 'Delhi'], 'Today': [5525, 5725], 'Yesterday': [5525, 5701]}
-df = pd.DataFrame(data)
-st.table(df)
+# --- TITLE ---
+st.title("🌾 Chana Crop Intelligence Report")
+st.caption("Reporting Date: February 22, 2026 | Frequency: Daily @ 10:30 AM")
 
-# Simple Temperature Graph
-st.subheader("🌡️ Temperature Trend")
-fig, ax = plt.subplots()
-ax.plot([1, 2, 3, 4], [28, 30, 31, 33], marker='o', color='orange', label="Max Temp")
-ax.set_ylabel("Celsius")
-ax.legend()
-st.pyplot(fig)
+# --- SECTION 1: NCDEX SPOT PRICES ---
+st.header("📈 NCDEX Spot Price Tracker (Chana)")
+st.markdown("Chana prices are seeing a bullish push this morning as the market reacts to the 'Short Spring' forecasts.")
 
-st.info("Status: Reproductive Stage. Watching for terminal heat stress in Sehore.")
+price_data = {
+    "Location": ["Bikaner", "Delhi", "Akola"],
+    "Today Price (₹/Q)": [5575.0, 5745.6, 5400.0],
+    "Y'day Price (₹/Q)": [5500.0, 5702.1, 5437.5],
+    "% Change": ["+1.36%", "+0.76%", "-0.69%"],
+    "Market Status": ["🟩 Strong Gain", "🟩 Firming Up", "🟦 Softening"]
+}
+st.table(pd.DataFrame(price_data))
+
+st.divider()
+
+# --- SECTION 2: WEATHER ANALYSIS ---
+st.header("🌡️ Temperature & Weather Analysis")
+st.markdown("IMD City Reports confirm a sharp rise in temperatures, tracking **3–5°C above normal**.")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.subheader("Bikaner (Rajasthan)")
+    st.metric("Max Temp Today", "31.0°C", "Departure +3.0°C")
+    st.write("**Outlook:** Max to hit 32°C tomorrow. Low humidity (28%) accelerating moisture loss.")
+
+with col2:
+    st.subheader("Sehore (Madhya Pradesh)")
+    st.metric("Max Temp Today", "33.0°C", "Departure +3.0°C")
+    st.write("**Outlook:** Terminal heat concern. Consistently breaching 32°C critical threshold.")
+
+st.divider()
+
+# --- SECTION 3: CROP FRONT ---
+st.header("🧬 Phenology & Crop Front Update")
+st.info("**Stage:** Reproductive to early Grain Filling (Most sensitive period)")
+
+c1, c2 = st.columns(2)
+with c1:
+    st.markdown("#### Terminal Heat Stress")
+    st.write("ICAR-CRIDA warns of 'forced maturity'. Night temps >16°C prevent recovery, reducing seed weight by 10-12%.")
+with c2:
+    st.markdown("#### Forced Ripening")
+    st.write("Crops in Sehore are maturing **7-10 days ahead** of schedule, potentially leading to shriveled grains.")
+
+st.divider()
+
+# --- SECTION 4: ADVISORY ---
+st.header("🩺 Agromet Advisory (Next 24-48 Hours)")
+st.success("**Irrigation:** Light irrigation recommended to lower canopy temperature. Avoid over-watering.")
+st.warning("**Heat Mitigation:** Foliar spray of Potassium Nitrate (1-0-45) @ 1% to help plant tolerate heat.")
+st.error("**Pest Monitoring:** Inspect for Pod Borer. Spray Indoxacarb if >1 larva seen per meter row.")
+
+st.markdown("---")
+st.caption("Data Sources: NCDEX, IMD, ICAR-CRIDA, AgPulse Analytica")
           `
         }
       }, document.getElementById("root"));
