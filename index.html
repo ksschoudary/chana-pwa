@@ -4,24 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Chana Intel Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.55.0/build/stlite.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
+    <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/browser@0.55.0/build/stlite.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.js"></script>
     <script>
       stlite.mount({
+        requirements: ["pandas", "matplotlib"],
         entrypoint: "app.py",
         files: {
           "app.py": `
 import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
 st.title("🌾 Chana Intelligence Dashboard")
-st.write("If you can see this, the app is working!")
-st.metric(label="Bikaner Chana", value="₹5,525", delta="+₹25")
-st.info("The app is currently downloading weather data...")
+st.markdown("### Daily Updates for Bikaner & Sehore")
+
+# Simple Data Table
+data = {'Market': ['Bikaner', 'Delhi'], 'Today': [5525, 5725], 'Yesterday': [5525, 5701]}
+df = pd.DataFrame(data)
+st.table(df)
+
+# Simple Temperature Graph
+st.subheader("🌡️ Temperature Trend")
+fig, ax = plt.subplots()
+ax.plot([1, 2, 3, 4], [28, 30, 31, 33], marker='o', color='orange', label="Max Temp")
+ax.set_ylabel("Celsius")
+ax.legend()
+st.pyplot(fig)
+
+st.info("Status: Reproductive Stage. Watching for terminal heat stress in Sehore.")
           `
         }
       }, document.getElementById("root"));
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js");
+      }
     </script>
   </body>
 </html>
