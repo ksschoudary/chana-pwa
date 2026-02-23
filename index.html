@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Chana Intel PWA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Chana Intel</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
-    <link rel="manifest" href="./manifest.json" />
     <style>
-      html, body, #root { font-family: 'Helvetica', sans-serif; background-color: #f0f2f6; }
-      /* Adds a loading message so you know it's working on iPhone */
-      #loading { 
-        display: flex; justify-content: center; align-items: center; 
-        height: 100vh; font-family: Helvetica; color: #555;
-      }
+        html, body { font-family: 'Helvetica', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
+        #loading-screen { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            height: 100vh; color: #5d4037; text-align: center;
+        }
     </style>
-  </head>
-  <body>
-    <div id="loading">🌾 Loading Chana Intelligence... Please wait 60s</div>
+</head>
+<body>
+    <div id="loading-screen">
+        <h2 style="font-family: Helvetica;">🌾 Chana Intel</h2>
+        <p>Loading Dashboard... (Wait 30s)</p>
+    </div>
     <div id="root"></div>
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.js"></script>
     <script>
       stlite.mount({
-        requirements: ["pandas", "matplotlib"],
+        requirements: ["pandas"],
         entrypoint: "app.py",
         files: {
           "app.py": `
@@ -31,49 +32,59 @@ from datetime import datetime
 
 st.set_page_config(page_title="Chana Intel", layout="wide")
 
-# Remove the loading message once Python starts
-st.markdown("<style>#loading {display: none !important;}</style>", unsafe_allow_html=True)
+# Hide loading screen & Force Helvetica
+st.markdown("<style>#loading-screen {display:none;} html, body, [class*='st-'] {font-family: 'Helvetica', sans-serif !important;}</style>", unsafe_allow_html=True)
 
-# Helvetica Font Enforcement
-st.markdown("<style>html, body, [class*='st-'] {font-family: 'Helvetica', sans-serif;}</style>", unsafe_allow_html=True)
-
-# Header
+# --- HEADER ---
 col_t, col_r = st.columns([4, 1])
 with col_t:
     st.title("🌾 Chana Intelligence Report")
-    st.caption(f"Last Updated: {datetime.now().strftime('%d %b %Y | %H:%M')}")
+    st.caption(f"**Last Updated:** {datetime.now().strftime('%d %b %Y | %H:%M:%S')}")
 with col_r:
-    if st.button("🔄 Refresh"):
+    if st.button("🔄 Refresh Now"):
         st.rerun()
 
 st.markdown("---")
 
-# Prices Table
-st.header("📈 NCDEX Spot Price Tracker")
-df = pd.DataFrame({
+# --- SECTION 1: NCDEX PRICES ---
+st.subheader("📈 NCDEX Spot Price Tracker (Chana)")
+st.write("Prices are firming up as arrivals stabilize and terminal heat concerns grow.")
+
+price_df = pd.DataFrame({
     "Location": ["Bikaner", "Delhi", "Akola"],
-    "Today": [5575.0, 5745.6, 5400.0],
-    "Change": ["+1.36%", "+0.76%", "-0.69%"],
-    "Status": ["🟩 Gain", "🟩 Firm", "🟦 Soft"]
+    "Today (₹/Q)": [5575.0, 5745.0, 5400.0],
+    "Y'day (₹/Q)": [5550.0, 5741.0, 5400.0],
+    "% Change": ["+0.45%", "+0.07%", "0.00%"],
+    "Status": ["🟩 Gaining", "🟩 Steady", "🟦 Neutral"]
 })
-st.table(df)
+st.table(price_df)
 
+# --- SECTION 2: WEATHER & PHENOLOGY ---
 st.divider()
+st.subheader("🌡️ Weather & Crop Front")
+col1, col2 = st.columns(2)
 
-# Weather & Advisory
-st.header("🌡️ Weather & Crop Outlook")
-c1, c2 = st.columns(2)
-with c1:
-    st.metric("Bikaner Max", "31.0°C", "+3.0°C")
-    st.info("Stage: Reproductive")
-with c2:
-    st.metric("Sehore Max", "33.0°C", "+3.0°C")
-    st.warning("Risk: Terminal Heat")
+with col1:
+    st.markdown("#### Bikaner (Rajasthan)")
+    st.metric("Max Temp Today", "32.0°C", "+3.8°C")
+    st.write("**Forecast:** Clear skies. Humidity at 24%—high evaporation risk.")
 
-st.success("**Advisory:** Apply light irrigation to cool the crop canopy.")
+with col2:
+    st.markdown("#### Sehore (Madhya Pradesh)")
+    st.metric("Max Temp Today", "33.0°C", "+3.0°C")
+    st.write("**Impact:** Night heat (>16°C) forcing maturity 7-10 days early.")
+
+# --- SECTION 3: ADVISORY ---
+st.divider()
+st.subheader("🩺 Agromet Advisory (Next 24-48 Hours)")
+st.success("**Irrigation:** Apply light morning watering to mitigate heat stress.")
+st.warning("**Heat Support:** Foliar spray of Potassium Nitrate (13-0-45) @ 1% to improve grain filling.")
+st.error("**Pest Watch:** Monitor for Pod Borer. Spray Indoxacarb if 1-2 larvae/meter row found.")
+
+st.caption("Data: NCDEX, IMD, ICAR-CRIDA | Report generated for Feb 23, 2026")
           `
         }
       }, document.getElementById("root"));
     </script>
-  </body>
+</body>
 </html>
