@@ -6,6 +6,12 @@
     <title>Chana Intel PWA</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
     <link rel="manifest" href="./manifest.json" />
+    <style>
+      /* This forces the Helvetica font across the entire app */
+      html, body, [class*="css"]  {
+        font-family: 'Helvetica', 'Arial', sans-serif !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
@@ -18,18 +24,40 @@
           "app.py": `
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+from datetime import datetime
+import time
 
+# 1. Page Config & Helvetica Styling
 st.set_page_config(page_title="Chana Intelligence", layout="wide")
 
-# --- TITLE ---
-st.title("🌾 Chana Crop Intelligence Report")
-st.caption("Reporting Date: February 22, 2026 | Frequency: Daily @ 10:30 AM")
+# Custom CSS for font enforcement inside Streamlit
+st.markdown("""
+    <style>
+    html, body, [class*="st-"] {
+        font-family: 'Helvetica', sans-serif;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# 2. Header & Refresh Logic
+col_title, col_refresh = st.columns([4, 1])
+
+with col_title:
+    st.title("🌾 Chana Crop Intelligence Report")
+    # Dynamically shows the current time as "Last Updated"
+    current_time = datetime.now().strftime("%d %b %Y | %H:%M:%S")
+    st.caption(f"Last Updated: {current_time}")
+
+with col_refresh:
+    if st.button("🔄 Refresh Now"):
+        with st.spinner("Fetching latest data..."):
+            time.sleep(1) # Simulates a quick data fetch
+            st.rerun()
+
+st.markdown("---")
 
 # --- SECTION 1: NCDEX SPOT PRICES ---
 st.header("📈 NCDEX Spot Price Tracker (Chana)")
-st.markdown("Chana prices are seeing a bullish push this morning as the market reacts to the 'Short Spring' forecasts.")
-
 price_data = {
     "Location": ["Bikaner", "Delhi", "Akola"],
     "Today Price (₹/Q)": [5575.0, 5745.6, 5400.0],
@@ -43,51 +71,33 @@ st.divider()
 
 # --- SECTION 2: WEATHER ANALYSIS ---
 st.header("🌡️ Temperature & Weather Analysis")
-st.markdown("IMD City Reports confirm a sharp rise in temperatures, tracking **3–5°C above normal**.")
-
-col1, col2 = st.columns(2)
-with col1:
+c_weather1, c_weather2 = st.columns(2)
+with c_weather1:
     st.subheader("Bikaner (Rajasthan)")
     st.metric("Max Temp Today", "31.0°C", "Departure +3.0°C")
-    st.write("**Outlook:** Max to hit 32°C tomorrow. Low humidity (28%) accelerating moisture loss.")
-
-with col2:
+with c_weather2:
     st.subheader("Sehore (Madhya Pradesh)")
     st.metric("Max Temp Today", "33.0°C", "Departure +3.0°C")
-    st.write("**Outlook:** Terminal heat concern. Consistently breaching 32°C critical threshold.")
 
 st.divider()
 
 # --- SECTION 3: CROP FRONT ---
-st.header("🧬 Phenology & Crop Front Update")
-st.info("**Stage:** Reproductive to early Grain Filling (Most sensitive period)")
-
-c1, c2 = st.columns(2)
-with c1:
-    st.markdown("#### Terminal Heat Stress")
-    st.write("ICAR-CRIDA warns of 'forced maturity'. Night temps >16°C prevent recovery, reducing seed weight by 10-12%.")
-with c2:
-    st.markdown("#### Forced Ripening")
-    st.write("Crops in Sehore are maturing **7-10 days ahead** of schedule, potentially leading to shriveled grains.")
+st.header("🧬 Phenology & Crop Front")
+st.info("**Stage:** Reproductive to early Grain Filling")
+st.write("ICAR-CRIDA warns of 'forced maturity'. Night temps >16°C prevent recovery.")
 
 st.divider()
 
 # --- SECTION 4: ADVISORY ---
-st.header("🩺 Agromet Advisory (Next 24-48 Hours)")
-st.success("**Irrigation:** Light irrigation recommended to lower canopy temperature. Avoid over-watering.")
-st.warning("**Heat Mitigation:** Foliar spray of Potassium Nitrate (1-0-45) @ 1% to help plant tolerate heat.")
-st.error("**Pest Monitoring:** Inspect for Pod Borer. Spray Indoxacarb if >1 larva seen per meter row.")
+st.header("🩺 Agromet Advisory")
+st.success("**Irrigation:** Light irrigation recommended for cooling.")
+st.warning("**Heat:** Foliar spray of Potassium Nitrate @ 1% advised.")
 
 st.markdown("---")
-st.caption("Data Sources: NCDEX, IMD, ICAR-CRIDA, AgPulse Analytica")
+st.caption("Data Sources: NCDEX, IMD, ICAR-CRIDA")
           `
         }
       }, document.getElementById("root"));
-    </script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js");
-      }
     </script>
   </body>
 </html>
