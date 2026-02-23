@@ -2,18 +2,21 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Chana Intel PWA</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
     <link rel="manifest" href="./manifest.json" />
     <style>
-      /* This forces the Helvetica font across the entire app */
-      html, body, [class*="css"]  {
-        font-family: 'Helvetica', 'Arial', sans-serif !important;
+      html, body, #root { font-family: 'Helvetica', sans-serif; background-color: #f0f2f6; }
+      /* Adds a loading message so you know it's working on iPhone */
+      #loading { 
+        display: flex; justify-content: center; align-items: center; 
+        height: 100vh; font-family: Helvetica; color: #555;
       }
     </style>
   </head>
   <body>
+    <div id="loading">🌾 Loading Chana Intelligence... Please wait 60s</div>
     <div id="root"></div>
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.js"></script>
     <script>
@@ -25,76 +28,49 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import time
 
-# 1. Page Config & Helvetica Styling
-st.set_page_config(page_title="Chana Intelligence", layout="wide")
+st.set_page_config(page_title="Chana Intel", layout="wide")
 
-# Custom CSS for font enforcement inside Streamlit
-st.markdown("""
-    <style>
-    html, body, [class*="st-"] {
-        font-family: 'Helvetica', sans-serif;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# Remove the loading message once Python starts
+st.markdown("<style>#loading {display: none !important;}</style>", unsafe_allow_html=True)
 
-# 2. Header & Refresh Logic
-col_title, col_refresh = st.columns([4, 1])
+# Helvetica Font Enforcement
+st.markdown("<style>html, body, [class*='st-'] {font-family: 'Helvetica', sans-serif;}</style>", unsafe_allow_html=True)
 
-with col_title:
-    st.title("🌾 Chana Crop Intelligence Report")
-    # Dynamically shows the current time as "Last Updated"
-    current_time = datetime.now().strftime("%d %b %Y | %H:%M:%S")
-    st.caption(f"Last Updated: {current_time}")
-
-with col_refresh:
-    if st.button("🔄 Refresh Now"):
-        with st.spinner("Fetching latest data..."):
-            time.sleep(1) # Simulates a quick data fetch
-            st.rerun()
+# Header
+col_t, col_r = st.columns([4, 1])
+with col_t:
+    st.title("🌾 Chana Intelligence Report")
+    st.caption(f"Last Updated: {datetime.now().strftime('%d %b %Y | %H:%M')}")
+with col_r:
+    if st.button("🔄 Refresh"):
+        st.rerun()
 
 st.markdown("---")
 
-# --- SECTION 1: NCDEX SPOT PRICES ---
-st.header("📈 NCDEX Spot Price Tracker (Chana)")
-price_data = {
+# Prices Table
+st.header("📈 NCDEX Spot Price Tracker")
+df = pd.DataFrame({
     "Location": ["Bikaner", "Delhi", "Akola"],
-    "Today Price (₹/Q)": [5575.0, 5745.6, 5400.0],
-    "Y'day Price (₹/Q)": [5500.0, 5702.1, 5437.5],
-    "% Change": ["+1.36%", "+0.76%", "-0.69%"],
-    "Market Status": ["🟩 Strong Gain", "🟩 Firming Up", "🟦 Softening"]
-}
-st.table(pd.DataFrame(price_data))
+    "Today": [5575.0, 5745.6, 5400.0],
+    "Change": ["+1.36%", "+0.76%", "-0.69%"],
+    "Status": ["🟩 Gain", "🟩 Firm", "🟦 Soft"]
+})
+st.table(df)
 
 st.divider()
 
-# --- SECTION 2: WEATHER ANALYSIS ---
-st.header("🌡️ Temperature & Weather Analysis")
-c_weather1, c_weather2 = st.columns(2)
-with c_weather1:
-    st.subheader("Bikaner (Rajasthan)")
-    st.metric("Max Temp Today", "31.0°C", "Departure +3.0°C")
-with c_weather2:
-    st.subheader("Sehore (Madhya Pradesh)")
-    st.metric("Max Temp Today", "33.0°C", "Departure +3.0°C")
+# Weather & Advisory
+st.header("🌡️ Weather & Crop Outlook")
+c1, c2 = st.columns(2)
+with c1:
+    st.metric("Bikaner Max", "31.0°C", "+3.0°C")
+    st.info("Stage: Reproductive")
+with c2:
+    st.metric("Sehore Max", "33.0°C", "+3.0°C")
+    st.warning("Risk: Terminal Heat")
 
-st.divider()
-
-# --- SECTION 3: CROP FRONT ---
-st.header("🧬 Phenology & Crop Front")
-st.info("**Stage:** Reproductive to early Grain Filling")
-st.write("ICAR-CRIDA warns of 'forced maturity'. Night temps >16°C prevent recovery.")
-
-st.divider()
-
-# --- SECTION 4: ADVISORY ---
-st.header("🩺 Agromet Advisory")
-st.success("**Irrigation:** Light irrigation recommended for cooling.")
-st.warning("**Heat:** Foliar spray of Potassium Nitrate @ 1% advised.")
-
-st.markdown("---")
-st.caption("Data Sources: NCDEX, IMD, ICAR-CRIDA")
+st.success("**Advisory:** Apply light irrigation to cool the crop canopy.")
           `
         }
       }, document.getElementById("root"));
