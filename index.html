@@ -1,90 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Chana Intel</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.css" />
-    <style>
-        html, body { font-family: 'Helvetica', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
-        #loading-screen { 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            height: 100vh; color: #5d4037; text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div id="loading-screen">
-        <h2 style="font-family: Helvetica;">🌾 Chana Intel</h2>
-        <p>Loading Dashboard... (Wait 30s)</p>
-    </div>
-    <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.65.1/build/stlite.js"></script>
-    <script>
-      stlite.mount({
-        requirements: ["pandas"],
-        entrypoint: "app.py",
-        files: {
-          "app.py": `
 import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+# 1. Page Configuration (Helvetica style)
 st.set_page_config(page_title="Chana Intel", layout="wide")
 
-# Hide loading screen & Force Helvetica
-st.markdown("<style>#loading-screen {display:none;} html, body, [class*='st-'] {font-family: 'Helvetica', sans-serif !important;}</style>", unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    html, body, [class*="st-"] {
+        font-family: 'Helvetica', 'Arial', sans-serif;
+    }
+    .main-header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #5D4037;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# --- HEADER ---
+# 2. Header & Refresh
 col_t, col_r = st.columns([4, 1])
 with col_t:
-    st.title("🌾 Chana Intelligence Report")
-    st.caption(f"**Last Updated:** {datetime.now().strftime('%d %b %Y | %H:%M:%S')}")
+    st.markdown('<p class="main-header">🌾 Chana Crop Intelligence Report</p>', unsafe_allow_html=True)
+    st.caption(f"**Date:** {datetime.now().strftime('%B %d, %Y')} | **Scheduled Update:** 10:30 AM")
 with col_r:
     if st.button("🔄 Refresh Now"):
         st.rerun()
 
-st.markdown("---")
+# --- SECTION 1: PRICE TRACKER ---
+st.header("📈 NCDEX Spot Price Tracker (Chana)")
+st.write("Chana prices are seeing a bullish push this morning. Bikaner has gained significantly as the market reacts to the 'Short Spring' forecasts and potential yield hits in Central India.")
 
-# --- SECTION 1: NCDEX PRICES ---
-st.subheader("📈 NCDEX Spot Price Tracker (Chana)")
-st.write("Prices are firming up as arrivals stabilize and terminal heat concerns grow.")
-
-price_df = pd.DataFrame({
+price_data = {
     "Location": ["Bikaner", "Delhi", "Akola"],
-    "Today (₹/Q)": [5575.0, 5745.0, 5400.0],
-    "Y'day (₹/Q)": [5550.0, 5741.0, 5400.0],
-    "% Change": ["+0.45%", "+0.07%", "0.00%"],
-    "Status": ["🟩 Gaining", "🟩 Steady", "🟦 Neutral"]
-})
-st.table(price_df)
+    "Today (₹/Q)": [5575.00, 5745.60, 5400.00],
+    "Yesterday (₹/Q)": [5500.00, 5702.10, 5437.50],
+    "% Change": ["+1.36%", "+0.76%", "-0.69%"],
+    "Market Status": ["🟩 Strong Gain", "🟩 Firming Up", "🟦 Softening"]
+}
+st.table(pd.DataFrame(price_data))
 
-# --- SECTION 2: WEATHER & PHENOLOGY ---
+# --- SECTION 2: WEATHER ANALYSIS ---
+st.header("🌡️ Temperature & Weather Analysis")
+st.write("Data from the IMD City Reports confirms a sharp rise in both day and night temperatures, tracking 3–5°C above normal in the rabi heartland.")
+
+weather_data = {
+    "Metric": ["Max Temp (Today)", "Min Temp (Today)", "Rainfall Outlook"],
+    "Bikaner (Rajasthan)": ["31.0°C", "16.5°C (+3.7°C)", "Nil; Deficit"],
+    "Sehore (MP)": ["33.0°C", "16.8°C (+2.5°C)", "Dry; Drought risk"]
+}
+st.table(pd.DataFrame(weather_data))
+
+col_w1, col_w2 = st.columns(2)
+with col_w1:
+    st.info("**Bikaner:** Max temps hitting 32°C. Absence of winter rain is creating low-humidity (RH 28%), accelerating moisture loss.")
+with col_w2:
+    st.info("**Sehore:** Terminal heat is the primary concern. Temperatures breaching 32°C critical threshold, impacting grain-filling.")
+
+# --- SECTION 3: CROP FRONT ---
+st.header("🧬 Phenology & Crop Front Update")
+st.write("The crop is currently in the **Reproductive to early Grain Filling** stage.")
+
+st.markdown("#### ⚠️ Terminal Heat Stress")
+st.write("According to ICAR-CRIDA, 'forced maturity' is active. Night temps >16°C prevent recovery, leading to a 10–12% reduction in seed weight.")
+
+st.markdown("#### ⚠️ Forced Ripening")
+st.write("In Sehore, crops are maturing **7–10 days ahead** of schedule. While this leads to early arrivals, it results in shriveled grains.")
+
+# --- SECTION 4: ADVISORY ---
+st.header("🩺 Agromet Advisory (Next 24-48 Hours)")
+st.success("**Irrigation Intervention:** Light irrigation recommended to lower canopy temperature. Avoid over-watering to prevent root rot.")
+st.warning("**Heat Mitigation:** Foliar spray of Potassium Nitrate (13-0-45) @ 1% to help the plant tolerate heat and improve grain quality.")
+st.error("**Pest Monitoring:** Ideal weather for Pod Borer. Spray Indoxacarb if 1-2 larvae per meter row are found.")
+
 st.divider()
-st.subheader("🌡️ Weather & Crop Front")
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("#### Bikaner (Rajasthan)")
-    st.metric("Max Temp Today", "32.0°C", "+3.8°C")
-    st.write("**Forecast:** Clear skies. Humidity at 24%—high evaporation risk.")
-
-with col2:
-    st.markdown("#### Sehore (Madhya Pradesh)")
-    st.metric("Max Temp Today", "33.0°C", "+3.0°C")
-    st.write("**Impact:** Night heat (>16°C) forcing maturity 7-10 days early.")
-
-# --- SECTION 3: ADVISORY ---
-st.divider()
-st.subheader("🩺 Agromet Advisory (Next 24-48 Hours)")
-st.success("**Irrigation:** Apply light morning watering to mitigate heat stress.")
-st.warning("**Heat Support:** Foliar spray of Potassium Nitrate (13-0-45) @ 1% to improve grain filling.")
-st.error("**Pest Watch:** Monitor for Pod Borer. Spray Indoxacarb if 1-2 larvae/meter row found.")
-
-st.caption("Data: NCDEX, IMD, ICAR-CRIDA | Report generated for Feb 23, 2026")
-          `
-        }
-      }, document.getElementById("root"));
-    </script>
-</body>
-</html>
+st.caption("Data Sources: NCDEX, IMD, ICAR-CRIDA, AgPulse Analytica")
